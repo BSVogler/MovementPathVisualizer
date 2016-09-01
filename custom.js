@@ -270,8 +270,7 @@ function addTrialToDOM(taskID, trialId, color) {
 	rawFile.open("GET", pathToReplay, false);
 	rawFile.onreadystatechange = function (){
 	    if(rawFile.readyState === 4 && (rawFile.status === 200 || rawFile.status == 0)){
-	        var allText = rawFile.responseText;
-			finishedLoading(allText)
+			finishedLoading(rawFile.responseText)
 	    }
 	}
 	rawFile.send(null);
