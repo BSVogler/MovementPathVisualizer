@@ -2,6 +2,7 @@ scene = document.querySelector('a-scene');
 scaling = 20;
 sceneOffset = new THREE.Vector3(1,1,0);
 showSpeed = false;
+showDir = false;
 
 
 //todo
@@ -105,7 +106,7 @@ function addTargetsToDOM(){
 	trialId: user id
 	color: color of line
 */
-function addTrialToDOM(taskID, trialId, color) {
+function addTrialToDOM(taskId, trialId, color) {
 
 	//when file is loaded, parse it
 	function finishedLoading(text) {
@@ -177,87 +178,72 @@ function addTrialToDOM(taskID, trialId, color) {
 						maxDv = dv;
 				}
 				lastDP = dp;
-					
-
+				
 				i += 4; //skip rest
 			}
 		}
 
-		console.log("done parsing to "+ listOfDPs.length + " elements. Max delta v:"+maxDv+" maxDistance: "+maxDistance+" max delta t: "+ maxDt+"s. Removed "+duplicatesCount+" duplicate points.");
-		
+		console.log("Done parsing to "+ listOfDPs.length + " elements. Max dv:"+maxDv+" maxDistance: "+maxDistance+" max dt: "+ maxDt+"s. Removed "+duplicatesCount+" duplicate points.");
 		
 		//add to DOM
-		if (showSpeed){
-			//add cone for direction
-			var cone = document.createElement("a-cone");
-			cone.setAttribute("color","color");
-			cone.setAttribute("radius-bottom","2");
-			cone.setAttribute("radius-top","0.1");
-			cone.setAttribute("position","0 1 1");
-			//cone.setAttribute("radius-top","0.1");
-			scene.appendChild(cone);
-			
-			//add line segments
-			for (var i = 1;i < listOfDPs.length;i++){
-				//only add non-duplicatesCount					
-				var lineset = document.createElement("a-entity");
-				lineset.setAttribute("class",taskID+"-"+trialID)
-				//var hexBrightness = new Buffer(1/distance, 'hex')[0];
-				var dt = listOfDPs[i].timestamp - listOfDPs[i-1].timestamp;
-				var dv = listOfDPs[i].distanceToNext/dt;
-				if (dv > 0){
-					var hexBrightness = (parseInt(255*dv/maxDv)).toString(16);
-					lineset.setAttribute("line","color:#"+hexBrightness+hexBrightness+hexBrightness+";");
-				}
-				if (dt > maxDt/3){
-					//var hexBrightness = (parseInt(255*dv/maxDv)).toString(16);
-					lineset.setAttribute("line","color:#ff0000;");
-				}
-			
-				var path = new Array();
-			
-				path.push(listOfDPs[i-1].position);
-				path.push(listOfDPs[i].position);
-
-				lineset.setAttribute("line", "path", path);
-				scene.appendChild(lineset);
-			}
-		} else {
+		if (!showSpeed){
 			//add one big line
 			var lineDOMObject = document.createElement("a-entity");
+			lineDOMObject.setAttribute("class",taskId+"-"+trialId)
 			lineDOMObject.setAttribute("line","color:"+color+";")
 			var path = new Array();
-			
-			//shift data to view, then add to path
-			for (var i = 0; i < listOfDPs.length; i++) {
-				if (i % 3 == 0) { //skip some elements
-					//add cone for direction
-					var cone = document.createElement("a-cone");
-					//cone.setAttribute("geometry","primitive","cone");
-					cone.setAttribute("color", color);
-					cone.setAttribute("radius-bottom", 0.008);
-					cone.setAttribute("radius-top", 0);
-					cone.setAttribute("open-ended", false);
-					cone.setAttribute("geometry", "segmentsRadial", 4);
-					cone.setAttribute("geometry", "segmentsHeight", 4);
-					cone.setAttribute("height", 0.04);
-					cone.setAttribute("position", listOfDPs[i].position);
-
-					var up = new THREE.Vector3(0,1,0);
-					var norm = new THREE.Vector3().copy(listOfDPs[i + 1].position).sub(listOfDPs[i].position).normalize();
-					//var norm = new THREE.Vector3(1,1,0).normalize();
-					var euler = new THREE.Euler(0, 0, 0, 'XYZ');
-					euler.setFromQuaternion(new THREE.Quaternion().setFromUnitVectors ( up, norm));
-					
-
-					cone.setAttribute("rotation", (euler.x * 180 / Math.PI) + " " + (euler.y * 180 / Math.PI) + " "+ (euler.z * 180 / Math.PI));
-					scene.appendChild(cone);
+		}
+		
+		var up = new THREE.Vector3(0,1,0);
+		
+		for (var i = 0; i < listOfDPs.length; i++) {
+			if (showSpeed) {
+				if (i < listOfDPs.length-1) {
+					var line = document.createElement("a-entity");
+					line.setAttribute("class", taskId+"-"+trialId)
+				
+					//var hexBrightness = new Buffer(1/distance, 'hex')[0];
+					let dt = listOfDPs[i+1].timestamp - listOfDPs[i].timestamp;
+					let dv = listOfDPs[i].distanceToNext / dt;
+					var hexBrightness = (parseInt(255*dv / maxDv)).toString(16);
+					line.setAttribute("line", "color:#"+hexBrightness+hexBrightness+hexBrightness+";");
+					if (dt > 2*maxDt / 3){
+						//var hexBrightness = (parseInt(255*dv/maxDv)).toString(16);
+						line.setAttribute("line","color:#ff0000;");
+					}
+					line.setAttribute("line", "path", [listOfDPs[i].position,listOfDPs[i+1].position]);
+					scene.appendChild(line);
 				}
+			} else {
 				path.push(listOfDPs[i].position);
 			}
+			
+			//add cones for direction
+			if (showDir && i % 3 == 0 && i < listOfDPs.length-1) { //skip some elements
+				//add cone for direction
+				var cone = document.createElement("a-cone");
+				//cone.setAttribute("geometry","primitive","cone");
+				cone.setAttribute("color", color);
+				cone.setAttribute("radius-bottom", 0.008);
+				cone.setAttribute("radius-top", 0);
+				cone.setAttribute("open-ended", false);
+				cone.setAttribute("geometry", "segmentsRadial", 4);
+				cone.setAttribute("geometry", "segmentsHeight", 4);
+				cone.setAttribute("height", 0.04);
+				cone.setAttribute("position", listOfDPs[i].position);
 
+				var norm = new THREE.Vector3().copy(listOfDPs[i + 1].position).sub(listOfDPs[i].position).normalize();
+				//var norm = new THREE.Vector3(1,1,0).normalize();
+				var euler = new THREE.Euler(0, 0, 0, 'XYZ');
+				euler.setFromQuaternion(new THREE.Quaternion().setFromUnitVectors ( up, norm));
+			
+				cone.setAttribute("rotation", (euler.x * 180 / Math.PI) + " " + (euler.y * 180 / Math.PI) + " "+ (euler.z * 180 / Math.PI));
+				scene.appendChild(cone);
+			}
+		}
+		if(!showSpeed){
 			lineDOMObject.setAttribute("line", "path", path);
-			scene.appendChild(lineDOMObject);	
+			scene.appendChild(lineDOMObject);
 		}
 		console.log("Done adding to DOM.");
 	}
@@ -265,7 +251,7 @@ function addTrialToDOM(taskID, trialId, color) {
 
 	//start reading file
 	var listOfDPs = new Array();
-	var pathToReplay = "/data/"+taskID+"_trial"+trialId+".replay";
+	var pathToReplay = "/data/"+taskId+"_trial"+trialId+".replay";
 	var linesOfDataFile ="";
 	var rawFile = new XMLHttpRequest();
 	rawFile.open("GET", pathToReplay, false);
