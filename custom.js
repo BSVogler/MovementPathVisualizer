@@ -278,7 +278,3 @@ function addTrialToDOM(taskID, trialId, color) {
 }
 
 addTargetsToDOM();
-for (var i = 0;i < 1; i++){
-	addTrialToDOM(2,i,"#"+((1<<24)*Math.random()|0).toString(16));
-	//addTrialToDOM(4,i,"#aaaaaa");
-}
