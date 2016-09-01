@@ -1,0 +1,7 @@
+data/
+node_modules/
+results/
+screenshots/
+spinvis.pdf
+
+.DS_Store
