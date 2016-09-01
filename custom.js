@@ -201,6 +201,7 @@ function addTrialToDOM(taskID, trialId, color) {
 			for (var i = 1;i < listOfDPs.length;i++){
 				//only add non-duplicatesCount					
 				var lineset = document.createElement("a-entity");
+				lineset.setAttribute("class",taskID+"-"+trialID)
 				//var hexBrightness = new Buffer(1/distance, 'hex')[0];
 				var dt = listOfDPs[i].timestamp - listOfDPs[i-1].timestamp;
 				var dv = listOfDPs[i].distanceToNext/dt;
