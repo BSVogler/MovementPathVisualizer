@@ -203,8 +203,8 @@ function addTrialToDOM(taskId, trialId, color) {
 					line.setAttribute("class", taskId+"-"+trialId)
 				
 					//var hexBrightness = new Buffer(1/distance, 'hex')[0];
-					let dt = listOfDPs[i+1].timestamp - listOfDPs[i].timestamp;
-					let dv = listOfDPs[i].distanceToNext / dt;
+					var dt = listOfDPs[i+1].timestamp - listOfDPs[i].timestamp;
+					var dv = listOfDPs[i].distanceToNext / dt;
 					var hexBrightness = (parseInt(255*dv / maxDv)).toString(16);
 					line.setAttribute("line", "color:#"+hexBrightness+hexBrightness+hexBrightness+";");
 					if (dt > 2*maxDt / 3){
