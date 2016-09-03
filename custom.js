@@ -5,10 +5,7 @@ showSpeed = false;
 showDir = false;
 
 
-//todo
-//1. control the data via gui
-//3. legende für die Farben
-//4. implement rotation
+document.getElementById("cursor").addEventListener("animationbegin", function(){ alert("Hello World!"); });
 
 function Datapoint(){
 	this.timestamp = 0.0;
