@@ -223,6 +223,7 @@ function addTrialToDOM(taskId, trialId, color) {
 				//add cone for direction
 				var cone = document.createElement("a-cone");
 				//cone.setAttribute("geometry","primitive","cone");
+				cone.setAttribute("class", taskId+"-"+trialId)
 				cone.setAttribute("color", color);
 				cone.setAttribute("radius-bottom", 0.008);
 				cone.setAttribute("radius-top", 0);

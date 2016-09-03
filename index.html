@@ -13,18 +13,37 @@
 		}
 	</style>
 	<script type="text/javascript">
-		function addTrial(){
+		function confirm(){
 			updateShowSpeed();
 			updateShowDir();
+			
 			var taskDOM = document.getElementById("task");
 			var task = taskDOM.options[taskDOM.selectedIndex].value;
 
 			var trialDOM = document.getElementById("trial");
 			var trial = trialDOM.options[trialDOM.selectedIndex].value;
+			
+			if (document.getElementById("confirmButton").value == "add Trial") {
+				addTrial(task, trial);
+			} else {
+				removeTrial(task, trial);
+			}
+		}
+	
+		function removeTrial(task, trial){
+			var scene = document.getElementById("scene").contentWindow.document;
+			elWithClass = scene.getElementsByClassName(task+"-"+trial);
+			while(elWithClass[0]) {
+				elWithClass[0].parentNode.removeChild(elWithClass[0]);
+			}
+			update();	
+		}
 		
-			var child = document.getElementById("scene");
-			if (child != null) {
-				child.contentWindow.addTrialToDOM(task, trial, "#"+((1<<24)*Math.random()|0).toString(16));
+		
+		function addTrial(task, trial){
+			var scene = document.getElementById("scene");
+			if (scene != null) {
+				scene.contentWindow.addTrialToDOM(task, trial, "#"+((1<<24)*Math.random()|0).toString(16));
 			}
 		
 			update();
@@ -113,7 +132,7 @@
 	<input type="checkbox" checked id="showDir" onclick="updateShowDir();" />
 	Show diretion (slow)
 		
-	<input id="confirmButton" type="button" onclick="addTrial();" value="add Trial" style="width:150px;" />	
+	<input id="confirmButton" type="button" onclick="confirm();" value="add Trial" style="width:150px;" />	
 
 
     <iframe id="scene" src="./scene.html" style="border:0px solid black;width:100%;height:98%;"></iframe>
