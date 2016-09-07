@@ -4,8 +4,9 @@ sceneOffset = new THREE.Vector3(1,1,0);
 showSpeed = false;
 showDir = false;
 currentAnimStep=0;
-
-
+//last added one
+listOfDPs = new Array();
+	
 //document.getElementById("cursoranim").addEventListener("animationbegin", function(){ alert("Hello World!"); });
 //register animation end to add new position
 document.getElementById("cursor").addEventListener("animationend", nextAnimationStep);
@@ -13,6 +14,7 @@ document.getElementById("cursor").addEventListener("animationend", nextAnimation
 function Datapoint(){
 	this.timestamp = 0.0; //time in ms
 	this.position = new THREE.Vector3();//in m(?)
+	this.rotation = new THREE.Quaternion();//in m(?)
 	this.distanceToNext = Number.POSITIVE_INFINITY;
 }
 
@@ -108,8 +110,8 @@ function addTargetsToDOM(){
 */
 function addTrialToDOM(taskId, trialId, color) {
 	//start reading file
-	listOfDPs = new Array();
 	var pathToReplay = "/data/"+taskId+"_trial"+trialId+".replay";
+	//listOfDPs = new Array();
 	var linesOfDataFile ="";
 	var rawFile = new XMLHttpRequest();
 	rawFile.open("GET", pathToReplay, false);
@@ -130,6 +132,7 @@ function finishedLoading(taskId, trialId, color, text) {
 	var maxDv = 0;
 
 	var duplicatesCount = 0;
+	var scaleDump = new THREE.Vector3();//dump values
 	for (var i = 0; i < lines.length; i++) {
 		var line = lines[i];
 		if (line.startsWith("t:")) {
@@ -157,12 +160,11 @@ function finishedLoading(taskId, trialId, color, text) {
 				parseFloat(lines[i + 3].substring(19, 24))
 			);
 
-
 			//var quaternion = new THREE.Quaternion();
-			//var scale = new THREE.Vector3();
-			//matrix.decompose( dp.position, quaternion, scale );
+			matrix.decompose( dp.position, dp.rotation, scaleDump );
 
-			dp.position = new THREE.Vector3(1, 1, 1).applyMatrix4(matrix);
+			//dp.position = new THREE.Vector3(1, 1, 1).applyMatrix4(matrix);
+			//dp.rotation = new THREE.Quaternion().setFromRotationMatrix(matrix.extractRotation());
 			//shift data to view, then add to path
 			//dp.position.applyQuaternion(quaternion);
 			dp.position.multiplyScalar(scaling);
@@ -172,7 +174,7 @@ function finishedLoading(taskId, trialId, color, text) {
 			if (listOfDPs.length > 0 && dp.position.equals(listOfDPs[listOfDPs.length-1].position))  {
 				duplicatesCount++;
 				//current one is the last one
-				listOfDPs[listOfDPs.length-1].timestamp = dp.timestamp;//refrehs timestap to last know timestamp at this pos
+				listOfDPs[listOfDPs.length-1].timestamp = dp.timestamp;//refrehs timestamp to last know timestamp at this pos
 				dp = listOfDPs[listOfDPs.length-1];
 			} else {
 				listOfDPs.push(dp);
@@ -248,7 +250,6 @@ function finishedLoading(taskId, trialId, color, text) {
 			cone.setAttribute("position", listOfDPs[i].position);
 
 			var norm = new THREE.Vector3().copy(listOfDPs[i + 1].position).sub(listOfDPs[i].position).normalize();
-			//var norm = new THREE.Vector3(1,1,0).normalize();
 			var euler = new THREE.Euler(0, 0, 0, 'XYZ');
 			euler.setFromQuaternion(new THREE.Quaternion().setFromUnitVectors ( up, norm));
 		
@@ -266,17 +267,32 @@ function finishedLoading(taskId, trialId, color, text) {
 }
 
 function nextAnimationStep(){
-	currentAnimStep+=1;
-	//remove last animation
-	var cursorNode = document.getElementById("cursor");
-	cursorNode.removeChild(cursorNode.firstChild);
+	if (currentAnimStep< listOfDPs.length-2) {
+		currentAnimStep+=1;
+		//remove last animation
+		var cursorNode = document.getElementById("cursor");
+		cursorNode.removeChild(cursorNode.firstChild);
 	
-	var anim = document.createElement("a-animation");
-	anim.setAttribute("attribute", "position");
-	anim.setAttribute("from", AFRAME.utils.coordinates.stringify(listOfDPs[currentAnimStep].position));
-	anim.setAttribute("to", listOfDPs[currentAnimStep+1].position.x + " " + listOfDPs[currentAnimStep+1].position.y + " " + listOfDPs[currentAnimStep+1].position.z);
-	anim.setAttribute("dur", listOfDPs[currentAnimStep+1].timestamp-listOfDPs[currentAnimStep].timestamp);
-	cursorNode.appendChild(anim);
+		var dur = listOfDPs[currentAnimStep+1].timestamp-listOfDPs[currentAnimStep].timestamp;
+	
+		var anim = document.createElement("a-animation");
+		anim.setAttribute("attribute", "position");
+		anim.setAttribute("from", AFRAME.utils.coordinates.stringify(listOfDPs[currentAnimStep].position));
+		anim.setAttribute("to", AFRAME.utils.coordinates.stringify(listOfDPs[currentAnimStep+1].position));
+		anim.setAttribute("dur", dur);
+		cursorNode.appendChild(anim);
+	
+		/*
+		var anim = document.createElement("a-animation");
+		anim.setAttribute("attribute", "rotation");
+		var euler1=new THREE.Euler(0,0,0, 'XYZ' ).setFromQuaternion(listOfDPs[currentAnimStep].rotation);
+		var euler2 = new THREE.Euler(0,0,0, 'XYZ' ).setFromQuaternion(listOfDPs[currentAnimStep+1].rotation);
+		anim.setAttribute("from", (euler1.x * 180 / Math.PI) + " " + (euler1.y * 180 / Math.PI) + " "+ (euler1.z * 180 / Math.PI));
+		anim.setAttribute("to", (euler2.x * 180 / Math.PI) + " " + (euler2.y * 180 / Math.PI) + " "+ (euler2.z * 180 / Math.PI));
+		anim.setAttribute("dur", dur);
+		cursorNode.appendChild(anim);*/
+	}
+	
 }
 
 addTargetsToDOM();
