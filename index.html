@@ -43,7 +43,8 @@
 		function addTrial(task, trial){
 			var scene = document.getElementById("scene");
 			if (scene != null) {
-				scene.contentWindow.addTrialToDOM(task, trial, "#"+((1<<24)*Math.random()|0).toString(16));
+				var pathToReplay = "./data/set1/"+task+"_trial"+trial+".replay";
+				scene.contentWindow.addTrialToDOM(pathToReplay, task, trial, "#"+((1<<24)*Math.random()|0).toString(16));
 			}
 		
 			update();

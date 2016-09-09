@@ -108,10 +108,8 @@ function addTargetsToDOM(){
 	trialId: user id
 	color: color of line
 */
-function addTrialToDOM(taskId, trialId, color) {
+function addTrialToDOM(pathToReplay, taskId, trialId, color) {
 	//start reading file
-	//listOfDPs = new Array();
-	var pathToReplay = "./data/"+taskId+"_trial"+trialId+".replay";
 	var linesOfDataFile ="";
 	var rawFile = new XMLHttpRequest();
 	rawFile.open("GET", pathToReplay, false);
