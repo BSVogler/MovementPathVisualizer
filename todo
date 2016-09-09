@@ -1,8 +1,7 @@
-separater view über ein Diagram
-
-color mapping mit Legende
-
-equity multiplier (nicht equalization)
+- color bug fixen
+- delta speed fixen
+- separater view über ein Diagram
+- color mapping mit Legende
 
 
 semantic zoom? wie implmentieren? Entfernung kamera vertex?

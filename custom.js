@@ -134,7 +134,7 @@ function parseText(taskId, trialId, color, text) {
 	var scaleDump = new THREE.Vector3();//dump values
 	for (var i = 0; i < lines.length; i++) {
 		//check if new format
-		if (lines[i].startsWith("taskSet")) {
+		if (i==0 && lines[0].startsWith("taskSet")) {
 			i += 1;
 			newFormat = true;
 			console.log("using new format");
@@ -148,38 +148,40 @@ function parseText(taskId, trialId, color, text) {
 				dp.timestamp = parseFloat(lines[i].substring(2, lines[i].length));
 				i += 1; //skip next line
 				var matrix = new THREE.Matrix4();
+				var splitted = lines[i].split(' ');
+				var j = 0;
+				//row major, fromArray() is column-major
 				matrix.set(
-					parseFloat(lines[i].substring(1, 6)),
-					parseFloat(lines[i].substring(7, 12)),
-					parseFloat(lines[i].substring(13, 18)),
-					parseFloat(lines[i].substring(19, 24)),
-					parseFloat(lines[i + 1].substring(1, 6)),
-					parseFloat(lines[i + 1].substring(7, 12)),
-					parseFloat(lines[i + 1].substring(13, 18)),
-					parseFloat(lines[i + 1].substring(19, 24)),
-					parseFloat(lines[i + 2].substring(1, 6)),
-					parseFloat(lines[i + 2].substring(7, 12)),
-					parseFloat(lines[i + 2].substring(13, 18)),
-					parseFloat(lines[i + 2].substring(19, 24)),
-					parseFloat(lines[i + 3].substring(1, 6)),
-					parseFloat(lines[i + 3].substring(7, 12)),
-					parseFloat(lines[i + 3].substring(13, 18)),
-					parseFloat(lines[i + 3].substring(19, 24))
+					parseFloat(splitted[j++]),
+					parseFloat(splitted[j++]),
+					parseFloat(splitted[j++]),
+					parseFloat(splitted[j++]),
+					parseFloat(splitted[j++]),
+					parseFloat(splitted[j++]),
+					parseFloat(splitted[j++]),
+					parseFloat(splitted[j++]),
+					parseFloat(splitted[j++]),
+					parseFloat(splitted[j++]),
+					parseFloat(splitted[j++]),
+					parseFloat(splitted[j++]),
+					parseFloat(splitted[j++]),
+					parseFloat(splitted[j++]),
+					parseFloat(splitted[j++]),
+					parseFloat(splitted[j++])
 				);
 
 				//var quaternion = new THREE.Quaternion();
 				matrix.decompose( dp.position, dp.rotation, scaleDump );
-				i += 3; //skip rest
 			} else {
-				var splited = lines[i].split(',');
-				dp.timestamp = parseFloat(splited[2]);
-				dp.position.x = parseFloat(splited[3]);
-				dp.position.y = parseFloat(splited[4]);
-				dp.position.z = parseFloat(splited[5]);
-				dp.rotation.x = parseFloat(splited[6]);
-				dp.rotation.y = parseFloat(splited[7]);
-				dp.rotation.z = parseFloat(splited[8]);
-				dp.rotation.w = parseFloat(splited[9]);
+				var splitted = lines[i].split(',');
+				dp.timestamp = parseFloat(splitted[2]);
+				dp.position.x = parseFloat(splitted[3]);
+				dp.position.y = parseFloat(splitted[4]);
+				dp.position.z = parseFloat(splitted[5]);
+				dp.rotation.x = parseFloat(splitted[6]);
+				dp.rotation.y = parseFloat(splitted[7]);
+				dp.rotation.z = parseFloat(splitted[8]);
+				dp.rotation.w = parseFloat(splitted[9]);
 			}
 			
 			//dp.position = new THREE.Vector3(1, 1, 1).applyMatrix4(matrix);
