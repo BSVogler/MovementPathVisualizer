@@ -236,21 +236,25 @@ function parseText(taskId, trialId, color, text) {
 	
 	//add every position
 	for (var i = 0; i < listOfDPs.length; i++) {
-		if (showSpeed) {
+		if (showSpeed && maxDv > 0) {
 			if (i < listOfDPs.length-1) {
 				var line = document.createElement("a-entity");
 				line.setAttribute("class", taskId+"-"+trialId)
 		
 				//var hexBrightness = new Buffer(1/distance, 'hex')[0];
-				var dt = listOfDPs[i+1].timestamp - listOfDPs[i].timestamp;
-				var dv = listOfDPs[i].distanceToNext / dt;
+				var dt = listOfDPs[i+1].timestamp - listOfDPs[i].timestamp;//time
+				var dv = listOfDPs[i].distanceToNext / dt;//velocity
 				var hexBrightness = (parseInt(255*dv / maxDv)).toString(16);
-				line.setAttribute("line", "color:#"+hexBrightness+hexBrightness+hexBrightness+";");
-				if (dt > 2*maxDt / 3){
-					//var hexBrightness = (parseInt(255*dv/maxDv)).toString(16);
-					line.setAttribute("line","color:#ff0000;");
+				if (hexBrightness.lenght == 1)//avoid invalid color
+					hexBrightness="0".concat(hexBrightness);
+				//make red if above 80% of max speed
+				var redfilter=hexBrightness;
+				if (dt > 2*maxDt / 5){
+					redfilter="00";
 				}
-				line.setAttribute("line", "path", [listOfDPs[i].position,listOfDPs[i+1].position]);
+				line.setAttribute("line", "color:#".concat(hexBrightness).concat(redfilter).concat(redfilter).concat(";"));
+			
+				line.setAttribute("line", "path", [listOfDPs[i].position, listOfDPs[i+1].position]);
 				scene.appendChild(line);
 			}
 		} else {
@@ -284,6 +288,7 @@ function parseText(taskId, trialId, color, text) {
 		lineDOMObject.setAttribute("line", "path", path);
 		scene.appendChild(lineDOMObject);
 	}
+
 	console.log("Done adding to DOM.");
 	currentAnimStep=0;
 	nextAnimationStep();
