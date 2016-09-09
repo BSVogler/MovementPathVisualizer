@@ -4,7 +4,7 @@ sceneOffset = new THREE.Vector3(1,1,0);
 showSpeed = false;
 showDir = false;
 currentAnimStep=0;
-//last added one
+//last added replay
 listOfDPs = new Array();
 	
 //document.getElementById("cursoranim").addEventListener("animationbegin", function(){ alert("Hello World!"); });
@@ -124,6 +124,8 @@ function addTrialToDOM(pathToReplay, taskId, trialId, color) {
 //when file is loaded, parse it
 function parseText(taskId, trialId, color, text) {
 	lines = text.split('\n');
+	listOfDPs = [];//clear list of datapoints because we will get a new one
+	
 	var lastDP = null;
 	var maxDistance = 0;
 	var maxDt = 0;
@@ -238,7 +240,7 @@ function parseText(taskId, trialId, color, text) {
 			if (i < listOfDPs.length-1) {
 				var line = document.createElement("a-entity");
 				line.setAttribute("class", taskId+"-"+trialId)
-			
+		
 				//var hexBrightness = new Buffer(1/distance, 'hex')[0];
 				var dt = listOfDPs[i+1].timestamp - listOfDPs[i].timestamp;
 				var dv = listOfDPs[i].distanceToNext / dt;
@@ -254,7 +256,7 @@ function parseText(taskId, trialId, color, text) {
 		} else {
 			path.push(listOfDPs[i].position);
 		}
-		
+	
 		//add cones for direction
 		if (showDir && i % 3 == 0 && i < listOfDPs.length-1) { //skip some elements
 			//add cone for direction
@@ -273,7 +275,7 @@ function parseText(taskId, trialId, color, text) {
 			var norm = new THREE.Vector3().copy(listOfDPs[i + 1].position).sub(listOfDPs[i].position).normalize();
 			var euler = new THREE.Euler(0, 0, 0, 'XYZ');
 			euler.setFromQuaternion(new THREE.Quaternion().setFromUnitVectors ( up, norm));
-		
+	
 			cone.setAttribute("rotation", (euler.x * 180 / Math.PI) + " " + (euler.y * 180 / Math.PI) + " "+ (euler.z * 180 / Math.PI));
 			scene.appendChild(cone);
 		}
