@@ -129,38 +129,59 @@ function parseText(taskId, trialId, color, text) {
 	var maxDt = 0;
 	var maxDv = 0;
 
+	var newFormat = false;
 	var duplicatesCount = 0;
 	var scaleDump = new THREE.Vector3();//dump values
 	for (var i = 0; i < lines.length; i++) {
-		var line = lines[i];
-		if (line.startsWith("t:")) {
-			//create new datapoint with timestamp and matrix
+		//check if new format
+		if (lines[i].startsWith("taskSet")) {
+			i += 1;
+			newFormat = true;
+			console.log("using new format");
+		}
+		
+		//create new datapoint with timestamp and matrix
+		if (newFormat || lines[i].startsWith("t:")) {
 			dp = new Datapoint();
-			dp.timestamp = parseFloat(line.substring(2, line.length));
-			i += 1; //skip next line
-			var matrix = new THREE.Matrix4();
-			matrix.set(
-				parseFloat(lines[i].substring(1, 6)),
-				parseFloat(lines[i].substring(7, 12)),
-				parseFloat(lines[i].substring(13, 18)),
-				parseFloat(lines[i].substring(19, 24)),
-				parseFloat(lines[i + 1].substring(1, 6)),
-				parseFloat(lines[i + 1].substring(7, 12)),
-				parseFloat(lines[i + 1].substring(13, 18)),
-				parseFloat(lines[i + 1].substring(19, 24)),
-				parseFloat(lines[i + 2].substring(1, 6)),
-				parseFloat(lines[i + 2].substring(7, 12)),
-				parseFloat(lines[i + 2].substring(13, 18)),
-				parseFloat(lines[i + 2].substring(19, 24)),
-				parseFloat(lines[i + 3].substring(1, 6)),
-				parseFloat(lines[i + 3].substring(7, 12)),
-				parseFloat(lines[i + 3].substring(13, 18)),
-				parseFloat(lines[i + 3].substring(19, 24))
-			);
+			
+			if (!newFormat) {
+				dp.timestamp = parseFloat(lines[i].substring(2, lines[i].length));
+				i += 1; //skip next line
+				var matrix = new THREE.Matrix4();
+				matrix.set(
+					parseFloat(lines[i].substring(1, 6)),
+					parseFloat(lines[i].substring(7, 12)),
+					parseFloat(lines[i].substring(13, 18)),
+					parseFloat(lines[i].substring(19, 24)),
+					parseFloat(lines[i + 1].substring(1, 6)),
+					parseFloat(lines[i + 1].substring(7, 12)),
+					parseFloat(lines[i + 1].substring(13, 18)),
+					parseFloat(lines[i + 1].substring(19, 24)),
+					parseFloat(lines[i + 2].substring(1, 6)),
+					parseFloat(lines[i + 2].substring(7, 12)),
+					parseFloat(lines[i + 2].substring(13, 18)),
+					parseFloat(lines[i + 2].substring(19, 24)),
+					parseFloat(lines[i + 3].substring(1, 6)),
+					parseFloat(lines[i + 3].substring(7, 12)),
+					parseFloat(lines[i + 3].substring(13, 18)),
+					parseFloat(lines[i + 3].substring(19, 24))
+				);
 
-			//var quaternion = new THREE.Quaternion();
-			matrix.decompose( dp.position, dp.rotation, scaleDump );
-
+				//var quaternion = new THREE.Quaternion();
+				matrix.decompose( dp.position, dp.rotation, scaleDump );
+				i += 3; //skip rest
+			} else {
+				var splited = lines[i].split(',');
+				dp.timestamp = parseFloat(splited[2]);
+				dp.position.x = parseFloat(splited[3]);
+				dp.position.y = parseFloat(splited[4]);
+				dp.position.z = parseFloat(splited[5]);
+				dp.rotation.x = parseFloat(splited[6]);
+				dp.rotation.y = parseFloat(splited[7]);
+				dp.rotation.z = parseFloat(splited[8]);
+				dp.rotation.w = parseFloat(splited[9]);
+			}
+			
 			//dp.position = new THREE.Vector3(1, 1, 1).applyMatrix4(matrix);
 			//dp.rotation = new THREE.Quaternion().setFromRotationMatrix(matrix.extractRotation());
 			//shift data to view, then add to path
@@ -192,7 +213,7 @@ function parseText(taskId, trialId, color, text) {
 			}
 			lastDP = dp;
 			
-			i += 4; //skip rest
+
 		}
 	}
 
