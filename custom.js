@@ -115,14 +115,14 @@ function addTrialToDOM(pathToReplay, taskId, trialId, color) {
 	rawFile.open("GET", pathToReplay, false);
 	rawFile.onreadystatechange = function (){
 	    if(rawFile.readyState === 4 && (rawFile.status === 200 || rawFile.status == 0)){
-			finishedLoading(taskId, trialId, color, rawFile.responseText)
+			parseText(taskId, trialId, color, rawFile.responseText)
 	    }
 	}
 	rawFile.send(null);
 }
 
 //when file is loaded, parse it
-function finishedLoading(taskId, trialId, color, text) {
+function parseText(taskId, trialId, color, text) {
 	lines = text.split('\n');
 	var lastDP = null;
 	var maxDistance = 0;
