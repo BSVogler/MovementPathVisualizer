@@ -286,30 +286,41 @@ function parseText(taskId, trialId, color, text) {
 }
 
 function nextAnimationStep(){
+	//has more animation steps
+
 	if (currentAnimStep< listOfDPs.length-2) {
 		currentAnimStep+=1;
+		
 		//remove last animation
 		var cursorNode = document.getElementById("cursor");
-		cursorNode.removeChild(cursorNode.firstChild);
+		while (cursorNode.hasChildNodes()) {
+		    cursorNode.removeChild(cursorNode.lastChild);
+		}
 	
 		var dur = listOfDPs[currentAnimStep+1].timestamp-listOfDPs[currentAnimStep].timestamp;
 	
-		var anim = document.createElement("a-animation");
-		anim.setAttribute("attribute", "position");
-		anim.setAttribute("from", AFRAME.utils.coordinates.stringify(listOfDPs[currentAnimStep].position));
-		anim.setAttribute("to", AFRAME.utils.coordinates.stringify(listOfDPs[currentAnimStep+1].position));
-		anim.setAttribute("dur", dur);
-		cursorNode.appendChild(anim);
+		var from = AFRAME.utils.coordinates.stringify(listOfDPs[currentAnimStep].position);
+		var to = AFRAME.utils.coordinates.stringify(listOfDPs[currentAnimStep+1].position);
+		if (from != to) {
+			var anim = document.createElement("a-animation");
+			anim.setAttribute("attribute", "position");
+			anim.setAttribute("from", from);
+			anim.setAttribute("to", to);
+			anim.setAttribute("dur", dur);
+			cursorNode.appendChild(anim);
+		}
 	
-		/*
-		var anim = document.createElement("a-animation");
-		anim.setAttribute("attribute", "rotation");
 		var euler1=new THREE.Euler(0,0,0, 'XYZ' ).setFromQuaternion(listOfDPs[currentAnimStep].rotation);
 		var euler2 = new THREE.Euler(0,0,0, 'XYZ' ).setFromQuaternion(listOfDPs[currentAnimStep+1].rotation);
-		anim.setAttribute("from", (euler1.x * 180 / Math.PI) + " " + (euler1.y * 180 / Math.PI) + " "+ (euler1.z * 180 / Math.PI));
-		anim.setAttribute("to", (euler2.x * 180 / Math.PI) + " " + (euler2.y * 180 / Math.PI) + " "+ (euler2.z * 180 / Math.PI));
-		anim.setAttribute("dur", dur);
-		cursorNode.appendChild(anim);*/
+		
+		if (!euler1.equals(euler2)) {
+			var anim = document.createElement("a-animation");
+			anim.setAttribute("attribute", "rotation");
+			anim.setAttribute("from", (euler1.x * 180 / Math.PI) + " " + (euler1.y * 180 / Math.PI) + " "+ (euler1.z * 180 / Math.PI));
+			anim.setAttribute("to", (euler2.x * 180 / Math.PI) + " " + (euler2.y * 180 / Math.PI) + " "+ (euler2.z * 180 / Math.PI));
+			anim.setAttribute("dur", dur);
+			cursorNode.appendChild(anim);
+		}
 	}
 	
 }
