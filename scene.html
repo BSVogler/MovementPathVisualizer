@@ -1,29 +1,34 @@
 <!DOCTYPE html>
 <html>
-  <head>
+	<head>
     <meta charset="utf-8">
     <title>Sci-Vis Project by Benedikt S. Vogler</title>
     <meta name="description" content="Visualization 2016 - Benedikt S. Vogler">
 	 <script src="./aframe.min.js"></script>
 	<script src="./aframe-animation-component.min.js"></script>
-  </head>
+	</head>
 	<body>
-		<a-scene fog="type: linear; near: 1; far: 25; color: #05c" />
-		<a-assets>
-		<!--<img id="my-texture" src="texture.jpg">-->
-		</a-assets>
-		<a-entity light="type: point; color: #FFF; groundColor: #000; intensity: 0.5" position="0 2.8 -1" ></a-entity>
-		<a-plane rotation= "-90 0 0" position= "0 -2.1 0" color="#94a550" height="100" width="100"></a-plane>
-		<a-plane id="table" rotation= "-90 0 0" position= "1 0.96 0" color="#aacccc" height="1" width="4"></a-plane>
-		<a-box id="cursor" color="gray" width="0.15" height="0.05" depth="0.3" color="#EF2D5E">
-			<a-animation attribute="scale" from="0 0 0" to="1 1 1" delay="500" dur="500" fill="both" easing="ease-out"></a-animation>
-			<a-animation attribute="position" from="0 -0.5 0" to="1 1.4 0" delay="500" dur="500" fill="both" easing="ease-out"></a-animation>
-			<a-animation attribute="rotation" from="0 -300 0" to="0 0 0" delay="500" dur="1200" fill="both" easing="ease-out"></a-animation>
-		</a-box>
-	 <a-entity id="camera" camera="near:0.01;" position="0 1.8 3" look-controls wasd-controls="fly:true;acceleration:40;"  />
-	 <a-sphere position="0 0 0" rotation="0 0 45" radius="0.1" height="0.1" color="#FFC65D">
-	 	<a-sky color="#ECECEC"></a-sky>
-	</a-scene>
-	 <script src="./custom.js"></script>
-  </body>
+		<a-scene fog="type: linear; near: 1; far: 20; color: #05c" />
+			<a-assets>
+			<!--<img id="my-texture" src="texture.jpg">-->
+			</a-assets>
+			 <a-sky material="fog: false" opacity="0.5" segments-width="30" src="./sky.jpg" color="#ECECEC" rotation="0 -50 0"></a-sky>
+			 
+			<a-entity light="type: point; color: #FFF; groundColor: #000; intensity: 0.5" position="0 2.8 -1" ></a-entity>
+
+		
+			<a-box id="cursor" color="gray" width="0.15" height="0.05" depth="0.3" color="#EF2D5E">
+				<a-animation attribute="scale" from="0 0 0" to="1 1 1" delay="500" dur="500" fill="both" easing="ease-out"></a-animation>
+				<a-animation attribute="position" from="0 -0.5 0" to="1 1.4 0" delay="500" dur="500" fill="both" easing="ease-out"></a-animation>
+				<a-animation attribute="rotation" from="0 -300 0" to="0 0 0" delay="500" dur="1200" fill="both" easing="ease-out"></a-animation>
+			</a-box>
+		
+			<a-plane id="table" rotation= "-90 0 0" position= "1 0.96 0" color="#aacccc" height="1" width="4"></a-plane>
+			<!--<a-plane id="floor" rotation= "-90 0 0" position= "0 -2.1 0" color="#94a550" height="100" width="100"></a-plane>-->
+		
+			<a-entity id="camera" camera="near:0.01;" position="0 1.8 3" look-controls wasd-controls="fly:true;acceleration:40;"  />
+			<a-sphere position="0 0 0" rotation="0 0 45" radius="0.1" height="0.1" color="#FFC65D">
+		</a-scene>
+		<script src="./custom.js"></script>
+	</body>
 </html>
