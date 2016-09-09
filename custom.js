@@ -169,7 +169,7 @@ function parseText(taskId, trialId, color, text) {
 			dp.position.add(sceneOffset);
 
 			//current one is duplicate
-			if (listOfDPs.length > 0 && dp.position.equals(listOfDPs[listOfDPs.length-1].position))  {
+			if (listOfDPs.length > 0 && dp.position.equals(listOfDPs[listOfDPs.length-1].position) && dp.rotation.equals(listOfDPs[listOfDPs.length-1].rotation))  {
 				duplicatesCount++;
 				//current one is the last one
 				listOfDPs[listOfDPs.length-1].timestamp = dp.timestamp;//refrehs timestamp to last know timestamp at this pos
