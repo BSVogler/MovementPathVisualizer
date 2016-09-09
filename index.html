@@ -12,6 +12,7 @@
 			font-family: sans-serif;	 
 		}
 	</style>
+	<script src="./randomColor.min.js"></script>
 	<script type="text/javascript">
 		function confirm(){
 			updateShowSpeed();
@@ -45,7 +46,7 @@
 			var scene = document.getElementById("scene");
 			if (scene != null) {
 				var pathToReplay = "./data/set"+setNum+"/"+task+"_trial"+trial+".replay";
-				scene.contentWindow.addTrialToDOM(pathToReplay, task, trial, "#"+((1<<24)*Math.random()|0).toString(16));
+				scene.contentWindow.addTrialToDOM(pathToReplay, task, trial, randomColor());
 			}
 		
 			update();
