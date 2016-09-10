@@ -297,19 +297,20 @@ function parseText(taskId, trialId, color, text) {
 }
 
 function nextAnimationStep(){
-	//has more animation steps
 
-	if (currentAnimStep< listOfDPs.length-2) {
-		currentAnimStep+=1;
-		
+	if (listOfDPs.length>0) {
+		//has more animation steps
+		currentAnimStep += 1;
+		currentAnimStep %= listOfDPs.length-1;
+
 		//remove last animation
 		var cursorNode = document.getElementById("cursor");
 		while (cursorNode.hasChildNodes()) {
-		    cursorNode.removeChild(cursorNode.lastChild);
+			cursorNode.removeChild(cursorNode.lastChild);
 		}
-	
-		var dur = listOfDPs[currentAnimStep+1].timestamp-listOfDPs[currentAnimStep].timestamp;
-	
+
+		var dur = listOfDPs[currentAnimStep+1].timestamp - listOfDPs[currentAnimStep].timestamp;
+
 		var from = AFRAME.utils.coordinates.stringify(listOfDPs[currentAnimStep].position);
 		var to = AFRAME.utils.coordinates.stringify(listOfDPs[currentAnimStep+1].position);
 		if (from != to) {
@@ -320,10 +321,10 @@ function nextAnimationStep(){
 			anim.setAttribute("dur", dur);
 			cursorNode.appendChild(anim);
 		}
-	
+
 		var euler1=new THREE.Euler(0,0,0, 'XYZ' ).setFromQuaternion(listOfDPs[currentAnimStep].rotation);
 		var euler2 = new THREE.Euler(0,0,0, 'XYZ' ).setFromQuaternion(listOfDPs[currentAnimStep+1].rotation);
-		
+
 		if (!euler1.equals(euler2)) {
 			var anim = document.createElement("a-animation");
 			anim.setAttribute("attribute", "rotation");
