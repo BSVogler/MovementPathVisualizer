@@ -64,6 +64,53 @@ AFRAME.registerComponent('line', {
 	}
 });
 
+AFRAME.registerComponent('segmentline', {
+  // Allow line component to accept vertices and color.
+	schema: {
+	  color: {
+	  	default : ['#333333'],
+	  },
+
+	  path: {
+	    default: [
+	      { x: -0.5, y: 0, z: 0 },
+	      { x: 0.5, y: 0, z: 0 }
+	    ],
+	    // Deserialize path in the form of comma-separated vec3s: `0 0 0, 1 1 1, 2 0 3`.
+	    parse: function (value) {
+			 return value.map(coordinates.parse);//removed split(",") because object creation does fail if set via setattribute 
+	    },
+	    // Serialize array of vec3s in case someone does
+	    // setAttribute('line', 'path', [...]).
+	    stringify: function (data) {
+	      return data.map(coordinates.stringify).join(',');
+	    }
+	  }
+	},
+	
+  // Create or update the line geometry.
+	update: function (oldData) {
+		var group = new THREE.Object3D();//create an empty container
+	  	for (i=0;i<this.data.path.length-1;i++) {
+	  		var geometry = new THREE.Geometry();
+	  		geometry.vertices.push( new THREE.Vector3(this.data.path[i].x, this.data.path[i].y, this.data.path[i].z));
+	  		geometry.vertices.push( new THREE.Vector3(this.data.path[i+1].x, this.data.path[i+1].y, this.data.path[i+1].z));
+
+			group.add( new THREE.Line(geometry, new THREE.LineBasicMaterial({
+	    		color: this.data.color[i],
+	    		transparent : true,
+	    		opacity: 1.0
+	  		})) );//add a mesh with geometry to it
+		
+	  	}
+	  this.el.setObject3D('mesh', group);
+	},
+
+	remove: function () {
+	  this.el.removeObject3D('mesh');
+	}
+});
+
 /*
 	Adds the left and right target to scene.	
 */
@@ -219,50 +266,46 @@ function parseText(taskId, trialId, color, text) {
 			}
 			lastDP = dp;
 			
-
 		}
 	}
 
 	console.log("Done parsing to "+ listOfDPs.length + " elements. Max dv:"+maxDv+" maxDistance: "+maxDistance+" max dt: "+ maxDt+"s. Removed "+duplicatesCount+" duplicate points.");
 	
-	//add to DOM
+	//add to one DOM object
+	var lineDOMObject = document.createElement("a-entity");
+	lineDOMObject.setAttribute("class",taskId+"-"+trialId);
+	var path = [];
+	
 	if (!showSpeed){
-		//add one big line
-		var lineDOMObject = document.createElement("a-entity");
-		lineDOMObject.setAttribute("class",taskId+"-"+trialId)
-		lineDOMObject.setAttribute("line","color:"+color+";")
-		var path = new Array();
+		lineDOMObject.setAttribute("line", "path", path);
+		lineDOMObject.setAttribute("line","color", color)
+	} else {
+		lineDOMObject.setAttribute("segmentline", "path", path);
+		color = [];
+		lineDOMObject.setAttribute("segmentline","color", color)
 	}
 	
 	var up = new THREE.Vector3(0,1,0);
 	
-	//add every position
+	//add every position value
 	for (var i = 0; i < listOfDPs.length; i++) {
-		if (showSpeed && maxDv > 0) {
-			if (i < listOfDPs.length-1) {
-				var line = document.createElement("a-entity");
-				line.setAttribute("class", taskId+"-"+trialId)
-		
-				//var hexBrightness = new Buffer(1/distance, 'hex')[0];
-				var dt = listOfDPs[i+1].timestamp - listOfDPs[i].timestamp;//time
-				var dv = listOfDPs[i].distanceToNext / dt;//velocity
-				var hexBrightness = (parseInt(255*dv / maxDv)).toString(16);
-				if (hexBrightness.length == 1)//avoid invalid color
-					hexBrightness="0".concat(hexBrightness);
-				//make red if above 80% of max speed
-				var redfilter=hexBrightness.concat(hexBrightness);
-				if (dt > 2*maxDt / 5){
-					redfilter="0000";
-				}
-				line.setAttribute("line", "color:#".concat(hexBrightness).concat(redfilter).concat(";"));
-			
-				line.setAttribute("line", "path", [listOfDPs[i].position, listOfDPs[i+1].position]);
-				scene.appendChild(line);
+		//if option for delta speed is enabled show with color
+		if (showSpeed && maxDv > 0 && i < listOfDPs.length-1) {
+			var dt = listOfDPs[i+1].timestamp - listOfDPs[i].timestamp;//time
+			var dv = listOfDPs[i].distanceToNext / dt;//velocity
+			var hexBrightness = (parseInt(255*dv / maxDv)).toString(16);
+			if (hexBrightness.length == 1)//avoid invalid color
+				hexBrightness="0".concat(hexBrightness);
+			//make red if above 80% of max speed
+			var redfilter=hexBrightness.concat(hexBrightness);
+			if (dt > 2*maxDt / 5){
+				redfilter = "0000";
 			}
-		} else {
-			path.push(listOfDPs[i].position);
+			
+			color.push("#".concat(hexBrightness).concat(redfilter));
 		}
-	
+		path.push(listOfDPs[i].position);
+
 		//add cones for direction
 		if (showDir && i % 3 == 0 && i < listOfDPs.length-1) { //skip some elements
 			//add cone for direction
@@ -286,10 +329,9 @@ function parseText(taskId, trialId, color, text) {
 			scene.appendChild(cone);
 		}
 	}
-	if(!showSpeed){
-		lineDOMObject.setAttribute("line", "path", path);
-		scene.appendChild(lineDOMObject);
-	}
+	
+	scene.appendChild(lineDOMObject);
+	
 
 	console.log("Done adding to DOM.");
 	currentAnimStep=0;
