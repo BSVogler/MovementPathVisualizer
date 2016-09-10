@@ -22,7 +22,7 @@ var coordinates = AFRAME.utils.coordinates;
 AFRAME.registerComponent('line', {
   // Allow line component to accept vertices and color.
 	schema: {
-	  color: { default: '#333' },
+	  color: { default: '#333333' },
 	  path: {
 	    default: [
 	      { x: -0.5, y: 0, z: 0 },
@@ -248,11 +248,11 @@ function parseText(taskId, trialId, color, text) {
 				if (hexBrightness.length == 1)//avoid invalid color
 					hexBrightness="0".concat(hexBrightness);
 				//make red if above 80% of max speed
-				var redfilter=hexBrightness;
+				var redfilter=hexBrightness.concat(hexBrightness);
 				if (dt > 2*maxDt / 5){
-					redfilter="00";
+					redfilter="0000";
 				}
-				line.setAttribute("line", "color:#".concat(hexBrightness).concat(redfilter).concat(redfilter).concat(";"));
+				line.setAttribute("line", "color:#".concat(hexBrightness).concat(redfilter).concat(";"));
 			
 				line.setAttribute("line", "path", [listOfDPs[i].position, listOfDPs[i+1].position]);
 				scene.appendChild(line);
