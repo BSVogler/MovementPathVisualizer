@@ -245,7 +245,7 @@ function parseText(taskId, trialId, color, text) {
 				var dt = listOfDPs[i+1].timestamp - listOfDPs[i].timestamp;//time
 				var dv = listOfDPs[i].distanceToNext / dt;//velocity
 				var hexBrightness = (parseInt(255*dv / maxDv)).toString(16);
-				if (hexBrightness.lenght == 1)//avoid invalid color
+				if (hexBrightness.length == 1)//avoid invalid color
 					hexBrightness="0".concat(hexBrightness);
 				//make red if above 80% of max speed
 				var redfilter=hexBrightness;
