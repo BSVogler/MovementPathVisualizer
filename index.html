@@ -20,15 +20,15 @@
 			
 			var taskDOM = document.getElementById("task");
 			var setNum = taskDOM.options[taskDOM.selectedIndex].value[0];
-			var task = taskDOM.options[taskDOM.selectedIndex].value[2];
-
+			var taskId = taskDOM.options[taskDOM.selectedIndex].value[2];
+		
 			var trialDOM = document.getElementById("trial");
-			var trial = trialDOM.options[trialDOM.selectedIndex].value;
+			var trialId = trialDOM.options[trialDOM.selectedIndex].value;
 			
 			if (document.getElementById("confirmButton").value == "add Trial") {
-				addTrial(setNum, task, trial);
+				addTrial(setNum, taskId, trialId);
 			} else {
-				removeTrial(task, trial);
+				removeTrial(taskId, trialId);
 			}
 		}
 	
@@ -41,7 +41,6 @@
 			update();	
 		}
 		
-		
 		function addTrial(setNum, task, trial){
 			var scene = document.getElementById("scene");
 			if (scene != null) {
@@ -53,22 +52,26 @@
 		}
 	
 		function update(){
+			//read current setting for Task id and trialID
 			var taskDOM = document.getElementById("task");
-			var task = taskDOM.options[taskDOM.selectedIndex].value[2];
+			var taskId = taskDOM.options[taskDOM.selectedIndex].value[2];
 		
 			var trialDOM = document.getElementById("trial");
-			var trial = trialDOM.options[trialDOM.selectedIndex].value;
-		
+			var trialId = trialDOM.options[trialDOM.selectedIndex].value;
+			
+			//default is to add data to scene
 			document.getElementById("confirmButton").value = "add Trial";
+			
+			//modify "trial" label
 			var sceneDOM = document.getElementById("scene");
 			if (sceneDOM != null) {
 				sceneDOM = sceneDOM.contentWindow.document;
-				for (var j = 0; j < document.getElementById("trial").options.length; j++) {
+				for (var j = 0; j < trialDOM.options.length; j++) {
 					//is in DOM?
-					if (sceneDOM.getElementsByClassName(task+"-"+j).length>0) {
+					if (sceneDOM.getElementsByClassName(taskId+"-"+j).length>0) {
 						trialDOM.options[j].text = j + " (added)";
 						//added element is the selected
-						if (j == trial) {
+						if (j == trialId) {
 							document.getElementById("confirmButton").value = "remove";
 						}
 					} else {
